@@ -1,0 +1,45 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* Page transition classes live in nuxt.config.ts */
+@source "../../../nuxt.config.ts";
+
+/*
+ * Design tokens — single source of truth.
+ * Brand scales are derived from the logo: royal blue (#004AAD, "genix")
+ * and orange (#FF7420, "di"). The blue scale ends in the navy (#0D1D4D)
+ * the original UI used for every call to action.
+ * Albert Sans is resolved and self-hosted once by @nuxt/fonts (bundled with @nuxt/ui).
+ */
+@theme static {
+  --font-sans: 'Albert Sans', ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: #EAF1FB;
+  --color-brand-100: #D0E0F6;
+  --color-brand-200: #A3C1EC;
+  --color-brand-300: #6E9CDF;
+  --color-brand-400: #3874CB;
+  --color-brand-500: #004AAD;
+  --color-brand-600: #003F94;
+  --color-brand-700: #00347A;
+  --color-brand-800: #0B2A63;
+  --color-brand-900: #0D1D4D;
+  --color-brand-950: #08122F;
+
+  --color-ember-50: #FFF4EC;
+  --color-ember-100: #FFE5D2;
+  --color-ember-200: #FFC8A3;
+  --color-ember-300: #FFA56B;
+  --color-ember-400: #FF8A40;
+  --color-ember-500: #FF7420;
+  --color-ember-600: #E85D0C;
+  --color-ember-700: #C1480A;
+  --color-ember-800: #993A10;
+  --color-ember-900: #7C3211;
+  --color-ember-950: #431606;
+}
+
+/* Sharp corners everywhere: every Nuxt UI radius token derives from this. */
+:root {
+  --ui-radius: 0;
+}

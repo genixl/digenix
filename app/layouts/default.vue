@@ -9,7 +9,10 @@
     <UFooter>
       <template #left>
         <p class="text-sm text-muted">
-          © {{ year }} {{ siteName }}. Software, designed and run with care.
+          © {{ year }} {{ siteName }}.
+          <template v-if="data?.sections.footer">
+            {{ data.sections.footer.body }}
+          </template>
         </p>
       </template>
 
@@ -33,4 +36,6 @@
 
 <script setup lang="ts">
 const year = new Date().getFullYear()
+
+const { data } = await useFetch('/api/content/site')
 </script>

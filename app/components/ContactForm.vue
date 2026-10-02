@@ -82,7 +82,7 @@
       >
         <USelect
           v-model="state.service"
-          :items="serviceItems"
+          :items="services"
           placeholder="Choose a service"
           class="w-full"
         />
@@ -128,9 +128,11 @@
 
 <script setup lang="ts">
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { contactSchema, contactServices, type ContactPayload } from '~~/server/utils/contactSchema'
+import { contactSchema, type ContactPayload } from '#shared/schemas/contact'
 
-const serviceItems = [...contactServices]
+defineProps<{
+  services: string[]
+}>()
 
 const state = reactive<Partial<ContactPayload>>({})
 const payload = ref<ContactPayload>()

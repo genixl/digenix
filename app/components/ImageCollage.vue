@@ -27,9 +27,9 @@
           :class="CELL_CLASSES[tile.cell]"
         >
           <img
-            v-if="tile.visual.kind === 'photo'"
-            :src="photoUrl(tile.visual.photo, 400, 400)"
-            :alt="tile.visual.photo.alt"
+            v-if="tile.visual.kind === 'photo' && tile.visual.imageUrl"
+            :src="sizedImage(tile.visual.imageUrl, 400, 400)"
+            :alt="tile.visual.imageAlt"
             width="400"
             height="400"
             decoding="async"
@@ -51,7 +51,7 @@
     </div>
 
     <figcaption class="flex items-center justify-between gap-4 font-mono text-xs uppercase tracking-widest text-muted">
-      <span>From the studio floor</span>
+      <span>{{ caption }}</span>
       <UButton
         :icon="playing ? 'i-lucide-pause' : 'i-lucide-play'"
         :aria-label="playing ? 'Pause image rotation' : 'Play image rotation'"
@@ -65,11 +65,20 @@
 </template>
 
 <script setup lang="ts">
+import type { InternalApi } from 'nitropack/types'
+
+type HeroVisual = InternalApi['/api/content/home']['get']['heroTiles'][number]
+
 interface Tile {
   id: number
   cell: number
   visual: HeroVisual
 }
+
+const props = defineProps<{
+  visuals: HeroVisual[]
+  caption?: string
+}>()
 
 // Literal class strings so Tailwind can see every grid placement.
 const CELL_CLASSES = [
@@ -84,7 +93,7 @@ const INTERVAL_MS = 1800
 
 const tiles = ref<Tile[]>(
   INITIAL_CELLS.flatMap((cell, index) => {
-    const visual = heroVisuals[index]
+    const visual = props.visuals[index]
     return visual ? [{ id: index, cell, visual }] : []
   })
 )
@@ -100,10 +109,11 @@ function pick<T>(items: readonly T[]): T | undefined {
 
 function takeNextVisual(): HeroVisual | undefined {
   const shown = new Set(tiles.value.map(tile => tile.visual))
-  for (let step = 0; step < heroVisuals.length; step++) {
-    const candidate = heroVisuals[(nextVisual + step) % heroVisuals.length]
+  const { visuals } = props
+  for (let step = 0; step < visuals.length; step++) {
+    const candidate = visuals[(nextVisual + step) % visuals.length]
     if (candidate && !shown.has(candidate)) {
-      nextVisual = (nextVisual + step + 1) % heroVisuals.length
+      nextVisual = (nextVisual + step + 1) % visuals.length
       return candidate
     }
   }

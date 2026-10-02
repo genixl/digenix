@@ -29,8 +29,21 @@ export default defineNuxtConfig({
     colorMode: false
   },
 
+  // Private only: none of these values are exposed under `public`.
+  runtimeConfig: {
+    databaseUrl: '',
+    jwtSecret: '',
+    cloudinary: {
+      cloudName: '',
+      apiKey: '',
+      apiSecret: ''
+    }
+  },
+
   routeRules: {
-    '/': { prerender: true }
+    '/admin': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
+    '/admin/**': { headers: { 'X-Robots-Tag': 'noindex, nofollow' } },
+    '/api/admin/**': { headers: { 'Cache-Control': 'no-store' } }
   },
 
   compatibilityDate: '2026-06-30',

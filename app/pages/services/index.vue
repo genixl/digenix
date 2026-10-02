@@ -1,29 +1,63 @@
 <template>
   <div>
-    <section class="border-b border-default">
+    <UContainer
+      v-if="error"
+      class="py-12"
+    >
+      <UAlert
+        color="error"
+        variant="subtle"
+        icon="i-lucide-circle-alert"
+        title="This page could not be loaded"
+        description="Please refresh in a moment."
+      />
+    </UContainer>
+
+    <section
+      v-if="sections?.hero"
+      class="border-b border-default"
+    >
       <UContainer class="grid grid-cols-1 items-center gap-10 py-12 md:grid-cols-2 lg:py-20">
         <div>
           <p class="font-mono text-sm uppercase tracking-widest text-secondary-600">
-            Services
+            {{ sections.hero.eyebrow }}
           </p>
           <h1 class="mt-4 text-5xl font-bold tracking-tighter text-balance text-highlighted lg:text-7xl">
-            Seven disciplines. One accountable team.
+            {{ sections.hero.title }}
           </h1>
-          <p class="mt-6 max-w-xl text-lg text-muted">
-            Bring us a single problem or an entire product. Each service works on its own, and they are designed to hand over cleanly to one another.
+          <p
+            v-if="sections.hero.body"
+            class="mt-6 max-w-xl text-lg text-muted"
+          >
+            {{ sections.hero.body }}
           </p>
         </div>
         <img
-          :src="illustration"
-          alt="Illustration of a monitor surrounded by cloud, server and messaging icons"
-          width="2000"
-          height="2000"
+          v-if="sections.hero.imageUrl"
+          :src="sizedImage(sections.hero.imageUrl, 1000, 1000)"
+          :alt="sections.hero.imageAlt"
+          width="1000"
+          height="1000"
           class="mx-auto w-full max-w-md"
         >
       </UContainer>
     </section>
 
-    <UContainer class="grid grid-cols-1 gap-12 py-16 lg:grid-cols-12 lg:py-24">
+    <UContainer
+      v-if="!services.length"
+      class="py-16 lg:py-24"
+    >
+      <UEmpty
+        icon="i-lucide-layers"
+        title="No services published yet"
+        variant="naked"
+      />
+    </UContainer>
+
+    <UContainer
+      v-else
+      class="grid grid-cols-1 gap-12 py-16 lg:grid-cols-12 lg:py-24"
+    >
       <nav
         aria-label="Services on this page"
         class="hidden lg:col-span-4 lg:block"
@@ -31,7 +65,7 @@
         <ol class="sticky top-24 flex flex-col border-l border-default">
           <li
             v-for="(service, index) in services"
-            :key="service.slug"
+            :key="service.id"
           >
             <ULink
               :to="`#${service.slug}`"
@@ -48,7 +82,7 @@
         <article
           v-for="(service, index) in services"
           :id="service.slug"
-          :key="service.slug"
+          :key="service.id"
           class="scroll-mt-24 py-10 first:pt-0"
         >
           <div class="flex items-center gap-4">
@@ -66,7 +100,10 @@
           <p class="mt-4 max-w-2xl text-lg text-muted">
             {{ service.summary }}
           </p>
-          <ul class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <ul
+            v-if="service.deliverables.length"
+            class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2"
+          >
             <li
               v-for="deliverable in service.deliverables"
               :key="deliverable"
@@ -79,7 +116,10 @@
               {{ deliverable }}
             </li>
           </ul>
-          <p class="mt-6 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted">
+          <p
+            v-if="service.timeline"
+            class="mt-6 flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-muted"
+          >
             <UIcon
               name="i-lucide-clock"
               class="size-4"
@@ -90,17 +130,22 @@
       </div>
     </UContainer>
 
-    <section class="border-t border-default bg-muted py-16 lg:py-24">
+    <section
+      v-if="engagementModels.length"
+      class="border-t border-default bg-muted py-16 lg:py-24"
+    >
       <UContainer class="flex flex-col gap-12">
         <SectionHeading
+          v-if="sections?.engagement"
           index="08"
-          eyebrow="Engagement models"
-          title="Pick the shape that fits your budget."
+          :eyebrow="sections.engagement.eyebrow"
+          :title="sections.engagement.title"
+          :lead="sections.engagement.body"
         />
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
           <UCard
             v-for="model in engagementModels"
-            :key="model.title"
+            :key="model.id"
           >
             <UIcon
               :name="model.icon"
@@ -112,7 +157,10 @@
             <p class="mt-2 text-muted">
               {{ model.description }}
             </p>
-            <p class="mt-4 font-mono text-xs uppercase tracking-widest text-secondary-600">
+            <p
+              v-if="model.bestFor"
+              class="mt-4 font-mono text-xs uppercase tracking-widest text-secondary-600"
+            >
               {{ model.bestFor }}
             </p>
           </UCard>
@@ -121,38 +169,22 @@
     </section>
 
     <CtaBand
-      title="Have a brief, or just a problem?"
-      lead="Either works. We will help you turn it into a scoped, priced plan within a week."
+      v-if="sections?.cta"
+      :title="sections.cta.title"
+      :lead="sections.cta.body"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import illustration from '~/assets/images/SW4.jpg'
+const { data, error } = await useFetch('/api/content/services')
+
+const sections = computed(() => data.value?.sections)
+const services = computed(() => data.value?.services ?? [])
+const engagementModels = computed(() => data.value?.engagementModels ?? [])
 
 useSeoMeta({
   title: 'Services',
-  description: 'Web platforms, mobile apps, cloud and DevOps, UI/UX design, AI and automation, technical consulting, and maintenance.'
+  description: () => sections.value?.hero?.body
 })
-
-const engagementModels = [
-  {
-    title: 'Fixed-scope project',
-    icon: 'i-lucide-flag',
-    description: 'A defined outcome split into priced milestones. You approve each demo before the next milestone begins.',
-    bestFor: 'Best for new products and MVPs'
-  },
-  {
-    title: 'Dedicated squad',
-    icon: 'i-lucide-users',
-    description: 'A cross-functional team working inside your roadmap and rituals, billed monthly and scaled up or down with notice.',
-    bestFor: 'Best for ongoing product development'
-  },
-  {
-    title: 'Care retainer',
-    icon: 'i-lucide-shield-check',
-    description: 'A monthly block of engineering hours for updates, fixes and improvements, with agreed response times.',
-    bestFor: 'Best for software already in production'
-  }
-]
 </script>

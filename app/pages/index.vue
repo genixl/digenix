@@ -1,19 +1,42 @@
 <template>
   <div>
-    <section class="border-b border-default">
+    <UContainer
+      v-if="error"
+      class="py-12"
+    >
+      <UAlert
+        color="error"
+        variant="subtle"
+        icon="i-lucide-circle-alert"
+        title="This page could not be loaded"
+        description="Please refresh in a moment."
+      />
+    </UContainer>
+
+    <section
+      v-if="sections?.hero || heroTiles.length"
+      class="border-b border-default"
+    >
       <UContainer class="grid grid-cols-1 items-center gap-12 py-12 md:py-16 lg:grid-cols-12 lg:py-24">
-        <div class="lg:col-span-6">
+        <div
+          v-if="sections?.hero"
+          class="lg:col-span-6"
+        >
           <UBadge
-            label="Software development studio"
+            v-if="sections.hero.eyebrow"
+            :label="sections.hero.eyebrow"
             color="secondary"
             variant="subtle"
             icon="i-lucide-sparkles"
           />
           <h1 class="mt-6 text-5xl font-bold tracking-tighter text-balance text-highlighted md:text-6xl lg:text-7xl">
-            Expand your business <span class="text-primary">beyond horizons.</span>
+            {{ sections.hero.title }} <span class="text-primary">{{ sections.hero.highlight }}</span>
           </h1>
-          <p class="mt-6 max-w-xl text-lg text-pretty text-muted md:text-xl">
-            We design, build and run custom software (web platforms, mobile apps, cloud infrastructure and AI tooling) on committed timelines, so you always know what ships and when.
+          <p
+            v-if="sections.hero.body"
+            class="mt-6 max-w-xl text-lg text-pretty text-muted md:text-xl"
+          >
+            {{ sections.hero.body }}
           </p>
           <div class="mt-8 flex flex-wrap gap-3">
             <UButton
@@ -30,23 +53,32 @@
               variant="outline"
             />
           </div>
-          <dl class="mt-10 grid grid-cols-1 gap-px border border-default bg-border sm:grid-cols-3">
+          <dl
+            v-if="heroMetrics.length"
+            class="mt-10 grid grid-cols-1 gap-px border border-default bg-border sm:grid-cols-3"
+          >
             <div
-              v-for="point in proofPoints.slice(0, 3)"
-              :key="point.label"
+              v-for="metric in heroMetrics"
+              :key="metric.id"
               class="flex flex-col bg-default p-4"
             >
               <dt class="text-sm text-muted">
-                {{ point.label }}
+                {{ metric.label }}
               </dt>
               <dd class="order-first text-2xl font-bold tracking-tight text-highlighted">
-                {{ point.value }}
+                {{ metric.value }}
               </dd>
             </div>
           </dl>
         </div>
-        <div class="lg:col-span-6">
-          <ImageCollage />
+        <div
+          v-if="heroTiles.length"
+          class="lg:col-span-6"
+        >
+          <ImageCollage
+            :visuals="heroTiles"
+            :caption="sections?.gallery?.eyebrow"
+          />
         </div>
       </UContainer>
     </section>
@@ -57,15 +89,25 @@
     >
       <UContainer class="flex flex-col gap-12">
         <SectionHeading
+          v-if="sections?.services"
           index="01"
-          eyebrow="Services"
-          title="Everything it takes to ship and run software."
-          lead="One accountable team from the first workshop to the thousandth deploy, so nothing falls between vendors."
+          :eyebrow="sections.services.eyebrow"
+          :title="sections.services.title"
+          :lead="sections.services.body"
         />
-        <ul class="grid grid-cols-1 gap-px border border-default bg-border md:grid-cols-2 lg:grid-cols-4">
+        <UEmpty
+          v-if="!services.length"
+          icon="i-lucide-layers"
+          title="No services published yet"
+          variant="naked"
+        />
+        <ul
+          v-else
+          class="grid grid-cols-1 gap-px border border-default bg-border md:grid-cols-2 lg:grid-cols-4"
+        >
           <li
             v-for="(service, index) in services"
-            :key="service.slug"
+            :key="service.id"
           >
             <NuxtLink
               :to="`/services#${service.slug}`"
@@ -93,9 +135,12 @@
               </span>
             </NuxtLink>
           </li>
-          <li class="flex flex-col justify-between gap-6 bg-primary-900 p-6 text-inverted">
+          <li
+            v-if="sections?.servicesCta"
+            class="flex flex-col justify-between gap-6 bg-primary-900 p-6 text-inverted"
+          >
             <p class="text-lg font-semibold">
-              Not sure where your project fits? Book a 30-minute technical call.
+              {{ sections.servicesCta.title }}
             </p>
             <UButton
               label="Book a call"
@@ -110,18 +155,22 @@
       </UContainer>
     </section>
 
-    <section class="border-y border-default bg-muted py-16 lg:py-24">
+    <section
+      v-if="processSteps.length"
+      class="border-y border-default bg-muted py-16 lg:py-24"
+    >
       <UContainer class="flex flex-col gap-12">
         <SectionHeading
+          v-if="sections?.process"
           index="02"
-          eyebrow="Process"
-          title="Five steps from first call to production."
-          lead="Each step ends with something you can see and sign off, and every milestone is priced before it starts."
+          :eyebrow="sections.process.eyebrow"
+          :title="sections.process.title"
+          :lead="sections.process.body"
         />
         <ol class="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-6">
           <li
             v-for="(step, index) in processSteps"
-            :key="step.title"
+            :key="step.id"
             class="flex flex-col gap-3 border-l-2 border-accented pl-6 transition-colors hover:border-secondary motion-reduce:transition-none lg:border-l-0 lg:border-t-2 lg:pl-0 lg:pt-6"
           >
             <span class="font-mono text-3xl font-bold text-secondary-600">{{ String(index + 1).padStart(2, '0') }}</span>
@@ -149,19 +198,28 @@
       </UContainer>
     </section>
 
-    <section class="bg-primary-900 py-16 text-inverted lg:py-24">
+    <section
+      v-if="techStack.length"
+      class="bg-primary-900 py-16 text-inverted lg:py-24"
+    >
       <UContainer class="flex flex-col gap-12">
-        <header class="grid gap-4 lg:grid-cols-12 lg:gap-8">
+        <header
+          v-if="sections?.technology"
+          class="grid gap-4 lg:grid-cols-12 lg:gap-8"
+        >
           <p class="flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-primary-200 lg:col-span-3 lg:pt-3">
             <span class="text-secondary-300">03</span>
-            <span>Technology</span>
+            <span>{{ sections.technology.eyebrow }}</span>
           </p>
           <div class="lg:col-span-9">
             <h2 class="text-3xl font-bold tracking-tighter text-balance md:text-4xl lg:text-5xl">
-              Proven tools, chosen for longevity.
+              {{ sections.technology.title }}
             </h2>
-            <p class="mt-4 max-w-2xl text-lg text-primary-100">
-              We pick boring, well-supported technology so your product is easy to hire for and cheap to maintain long after launch.
+            <p
+              v-if="sections.technology.body"
+              class="mt-4 max-w-2xl text-lg text-primary-100"
+            >
+              {{ sections.technology.body }}
             </p>
           </div>
         </header>
@@ -192,25 +250,33 @@
       </UContainer>
     </section>
 
-    <section class="py-16 lg:py-24">
+    <section
+      v-if="caseStudies.length"
+      class="py-16 lg:py-24"
+    >
       <UContainer class="flex flex-col gap-12">
         <SectionHeading
+          v-if="sections?.work"
           index="04"
-          eyebrow="Selected work"
-          title="Software that is already earning its keep."
+          :eyebrow="sections.work.eyebrow"
+          :title="sections.work.title"
+          :lead="sections.work.body"
         />
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <NuxtLink
-            v-for="(study, index) in caseStudies.slice(0, 3)"
-            :key="study.slug"
+            v-for="(study, index) in caseStudies"
+            :key="study.id"
             :to="`/work#${study.slug}`"
             class="group flex flex-col border border-default bg-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             :class="index === 0 ? 'md:col-span-2 lg:col-span-1 lg:row-span-2' : ''"
           >
-            <div class="overflow-hidden">
+            <div
+              v-if="study.imageUrl"
+              class="overflow-hidden"
+            >
               <img
-                :src="photoUrl(study.photo, 800, 600)"
-                :alt="study.photo.alt"
+                :src="sizedImage(study.imageUrl, 800, 600)"
+                :alt="study.imageAlt"
                 width="800"
                 height="600"
                 loading="lazy"
@@ -249,29 +315,35 @@
       </UContainer>
     </section>
 
-    <section class="border-y border-default bg-muted py-16 lg:py-24">
+    <section
+      v-if="metrics.length || commitments.length"
+      class="border-y border-default bg-muted py-16 lg:py-24"
+    >
       <UContainer class="grid grid-cols-1 gap-12 lg:grid-cols-12">
         <div class="flex flex-col gap-10 lg:col-span-5">
-          <div>
+          <div v-if="sections?.whyUs">
             <p class="flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-muted">
               <span class="text-secondary-600">05</span>
-              <span>Why us</span>
+              <span>{{ sections.whyUs.eyebrow }}</span>
             </p>
             <h2 class="mt-4 text-3xl font-bold tracking-tighter text-balance text-highlighted md:text-4xl lg:text-5xl">
-              Commitments, written into every contract.
+              {{ sections.whyUs.title }}
             </h2>
           </div>
-          <dl class="grid grid-cols-2 gap-px border border-default bg-border">
+          <dl
+            v-if="metrics.length"
+            class="grid grid-cols-2 gap-px border border-default bg-border"
+          >
             <div
-              v-for="point in proofPoints"
-              :key="point.label"
+              v-for="metric in metrics"
+              :key="metric.id"
               class="flex flex-col bg-default p-5"
             >
               <dt class="text-sm text-muted">
-                {{ point.label }}
+                {{ metric.label }}
               </dt>
               <dd class="order-first text-3xl font-bold tracking-tight text-highlighted">
-                {{ point.value }}
+                {{ metric.value }}
               </dd>
             </div>
           </dl>
@@ -279,7 +351,7 @@
         <ul class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:col-span-7">
           <li
             v-for="commitment in commitments"
-            :key="commitment.title"
+            :key="commitment.id"
             class="flex flex-col gap-3"
           >
             <span class="flex size-12 items-center justify-center bg-primary text-inverted">
@@ -299,11 +371,15 @@
       </UContainer>
     </section>
 
-    <section class="py-16 lg:py-24">
+    <section
+      v-if="sections?.team"
+      class="py-16 lg:py-24"
+    >
       <UContainer class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
         <img
-          :src="photoUrl(teamPhoto, 1200, 900)"
-          :alt="teamPhoto.alt"
+          v-if="sections.team.imageUrl"
+          :src="sizedImage(sections.team.imageUrl, 1200, 900)"
+          :alt="sections.team.imageAlt"
           width="1200"
           height="900"
           loading="lazy"
@@ -314,19 +390,25 @@
           <div>
             <p class="flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-muted">
               <span class="text-secondary-600">06</span>
-              <span>Team & culture</span>
+              <span>{{ sections.team.eyebrow }}</span>
             </p>
             <h2 class="mt-4 text-3xl font-bold tracking-tighter text-balance text-highlighted md:text-4xl">
-              Small, senior and in the room with you.
+              {{ sections.team.title }}
             </h2>
-            <p class="mt-4 text-lg text-muted">
-              Every project gets a compact squad drawn from four disciplines. You talk to the people building your product, in your Slack, every day.
+            <p
+              v-if="sections.team.body"
+              class="mt-4 text-lg text-muted"
+            >
+              {{ sections.team.body }}
             </p>
           </div>
-          <ul class="grid grid-cols-1 gap-px border border-default bg-border sm:grid-cols-2">
+          <ul
+            v-if="disciplines.length"
+            class="grid grid-cols-1 gap-px border border-default bg-border sm:grid-cols-2"
+          >
             <li
               v-for="discipline in disciplines"
-              :key="discipline.title"
+              :key="discipline.id"
               class="flex items-center gap-3 bg-default p-4"
             >
               <UIcon
@@ -349,24 +431,31 @@
     </section>
 
     <section
+      v-if="services.length"
       id="contact"
       class="border-t border-default bg-muted py-16 lg:py-24"
     >
       <UContainer class="grid grid-cols-1 gap-12 lg:grid-cols-12">
-        <div class="lg:col-span-5">
+        <div
+          v-if="sections?.contact"
+          class="lg:col-span-5"
+        >
           <p class="flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-muted">
             <span class="text-secondary-600">07</span>
-            <span>Contact</span>
+            <span>{{ sections.contact.eyebrow }}</span>
           </p>
           <h2 class="mt-4 text-3xl font-bold tracking-tighter text-balance text-highlighted md:text-4xl lg:text-5xl">
-            Tell us what you are building.
+            {{ sections.contact.title }}
           </h2>
-          <p class="mt-4 text-lg text-muted">
-            Share a few lines about your project. A senior engineer, not a salesperson, replies within one business day.
+          <p
+            v-if="sections.contact.body"
+            class="mt-4 text-lg text-muted"
+          >
+            {{ sections.contact.body }}
           </p>
         </div>
         <UCard class="lg:col-span-7">
-          <ContactForm />
+          <ContactForm :services="services.map(service => service.title)" />
         </UCard>
       </UContainer>
     </section>
@@ -374,7 +463,20 @@
 </template>
 
 <script setup lang="ts">
+const { data, error } = await useFetch('/api/content/home')
+
+const sections = computed(() => data.value?.sections)
+const heroTiles = computed(() => data.value?.heroTiles ?? [])
+const metrics = computed(() => data.value?.metrics ?? [])
+const heroMetrics = computed(() => metrics.value.filter(metric => metric.showInHero).slice(0, 3))
+const services = computed(() => data.value?.services ?? [])
+const processSteps = computed(() => data.value?.processSteps ?? [])
+const techStack = computed(() => data.value?.techStack ?? [])
+const caseStudies = computed(() => data.value?.caseStudies ?? [])
+const commitments = computed(() => data.value?.commitments ?? [])
+const disciplines = computed(() => data.value?.disciplines ?? [])
+
 useSeoMeta({
-  description: `${siteName} designs, builds and runs custom web platforms, mobile apps, cloud infrastructure and AI tooling on committed timelines.`
+  description: () => sections.value?.hero?.body
 })
 </script>

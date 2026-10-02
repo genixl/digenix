@@ -9,19 +9,30 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx --env-file-if-exists=.env server/db/seed.ts"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.129",
     "@iconify-json/simple-icons": "^1.2.94",
+    "@neondatabase/serverless": "^1.1.0",
     "@nuxt/ui": "^4.11.0",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
+    "drizzle-orm": "^0.45.3",
+    "jose": "^6.2.12",
     "nuxt": "^4.5.2",
     "tailwindcss": "^4.3.3",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.17.0",
+    "@types/node": "^26.6.3",
+    "drizzle-kit": "^0.31.11",
     "eslint": "^10.10.0",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vue-router": "5.2.0",
     "vue-tsc": "^3.3.11"

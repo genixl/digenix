@@ -257,7 +257,8 @@ import { adminResourceNames, type AdminResourceName } from '#shared/schemas/cont
 type Row = Record<string, unknown>
 type Result = { value: string, label: string }
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+// No page transition: UDashboardPanel has multiple root nodes. Keying by path remounts the page per resource.
+definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false, key: route => route.fullPath })
 
 const route = useRoute()
 const toast = useToast()

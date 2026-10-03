@@ -32,7 +32,8 @@
 <script setup lang="ts">
 import type { InternalApi } from 'nitropack/types'
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+// UDashboardPanel renders multiple root nodes, which an out-in page transition cannot mount.
+definePageMeta({ layout: 'admin', middleware: 'admin', pageTransition: false })
 useSeoMeta({ title: 'Admin' })
 
 const { data: session } = useNuxtData<InternalApi['/api/auth/session']['get']>('admin-session')

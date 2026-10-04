@@ -82,8 +82,9 @@ const faqs = computed<AccordionItem[]>(() =>
   (data.value?.faqs ?? []).map(faq => ({ label: faq.question, content: faq.answer }))
 )
 
-useSeoMeta({
+usePageSeo({
   title: 'Contact',
-  description: () => sections.value?.hero?.body
+  seo: () => sections.value?.seo,
+  fallback: () => sections.value?.hero
 })
 </script>

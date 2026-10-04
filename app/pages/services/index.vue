@@ -183,8 +183,9 @@ const sections = computed(() => data.value?.sections)
 const services = computed(() => data.value?.services ?? [])
 const engagementModels = computed(() => data.value?.engagementModels ?? [])
 
-useSeoMeta({
+usePageSeo({
   title: 'Services',
-  description: () => sections.value?.hero?.body
+  seo: () => sections.value?.seo,
+  fallback: () => sections.value?.hero
 })
 </script>

@@ -476,7 +476,23 @@ const caseStudies = computed(() => data.value?.caseStudies ?? [])
 const commitments = computed(() => data.value?.commitments ?? [])
 const disciplines = computed(() => data.value?.disciplines ?? [])
 
-useSeoMeta({
-  description: () => sections.value?.hero?.body
+const { description, url } = usePageSeo({
+  seo: () => sections.value?.seo,
+  fallback: () => sections.value?.hero
+})
+
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    // Escape `<` so admin-entered copy cannot close the script tag.
+    innerHTML: () => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      'name': siteName,
+      'url': url.value,
+      'logo': new URL('/digenix.png', url.value).href,
+      'description': description.value
+    }).replaceAll('<', '\\u003c')
+  }]
 })
 </script>

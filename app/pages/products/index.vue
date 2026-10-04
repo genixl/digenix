@@ -88,8 +88,9 @@ const { data, error } = await useFetch('/api/content/products')
 const sections = computed(() => data.value?.sections)
 const products = computed(() => data.value?.products ?? [])
 
-useSeoMeta({
+usePageSeo({
   title: 'Products',
-  description: () => sections.value?.hero?.body
+  seo: () => sections.value?.seo,
+  fallback: () => sections.value?.hero
 })
 </script>

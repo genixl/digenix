@@ -182,8 +182,9 @@ const principles = computed(() => data.value?.principles ?? [])
 const disciplines = computed(() => data.value?.disciplines ?? [])
 const teamMembers = computed(() => data.value?.teamMembers ?? [])
 
-useSeoMeta({
+usePageSeo({
   title: 'About',
-  description: () => sections.value?.story?.body
+  seo: () => sections.value?.seo,
+  fallback: () => sections.value?.story
 })
 </script>

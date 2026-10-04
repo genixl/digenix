@@ -158,8 +158,9 @@ const { data, error } = await useFetch('/api/content/work')
 const sections = computed(() => data.value?.sections)
 const caseStudies = computed(() => data.value?.caseStudies ?? [])
 
-useSeoMeta({
+usePageSeo({
   title: 'Work',
-  description: () => sections.value?.hero?.body
+  seo: () => sections.value?.seo,
+  fallback: () => sections.value?.hero
 })
 </script>

@@ -173,7 +173,7 @@ export const adminResourceMeta: Record<AdminResourceName, AdminResourceMeta> = {
     icon: 'i-lucide-text',
     columns: cols(['key', 'Section'], ['title', 'Title'], ['published', 'Published']),
     fields: [
-      { name: 'key', label: 'Section', type: 'select', options: sectionKeys, help: 'Page and slot this copy fills' },
+      { name: 'key', label: 'Section', type: 'select', options: sectionKeys, help: 'Page and slot this copy fills. A published *.seo slot overrides the page search title, description and share image.' },
       text('eyebrow', 'Eyebrow', 'Small label above the title'),
       text('title', 'Title'),
       text('highlight', 'Highlight', 'Coloured words after the title (hero sections)'),

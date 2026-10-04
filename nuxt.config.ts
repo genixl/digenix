@@ -29,7 +29,7 @@ export default defineNuxtConfig({
     colorMode: false
   },
 
-  // Private only: none of these values are exposed under `public`.
+  // Secrets stay at the top level; `public` holds only non-sensitive values.
   runtimeConfig: {
     databaseUrl: '',
     jwtSecret: '',
@@ -37,6 +37,9 @@ export default defineNuxtConfig({
       cloudName: '',
       apiKey: '',
       apiSecret: ''
+    },
+    public: {
+      siteUrl: ''
     }
   },
 

@@ -22,19 +22,25 @@ export const sectionKeys = [
   'home.whyUs',
   'home.team',
   'home.contact',
+  'home.seo',
   'services.hero',
   'services.engagement',
   'services.cta',
+  'services.seo',
   'work.hero',
   'work.cta',
+  'work.seo',
   'about.hero',
   'about.story',
   'about.principles',
   'about.disciplines',
   'about.team',
   'about.cta',
+  'about.seo',
   'contact.hero',
-  'products.hero'
+  'contact.seo',
+  'products.hero',
+  'products.seo'
 ] as const
 export type SectionKey = typeof sectionKeys[number]
 type PageOf<K> = K extends `${infer P}.${string}` ? P : never
